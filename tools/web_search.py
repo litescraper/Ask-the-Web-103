@@ -69,6 +69,8 @@ class WebSearchTool(BaseTool):
         try:
             if self._settings.search_provider == SearchProvider.TAVILY:
                 results = await self._tavily_search(query, num_results, search_depth)
+            elif self._settings.search_provider == SearchProvider.LITESCRAPE:
+                results = await self._litescrape_search(query, num_results)
             else:
                 results = await self._serpapi_search(query, num_results)
 
@@ -146,4 +148,33 @@ class WebSearchTool(BaseTool):
                 "score": "1.0",
             }
             for r in data.get("organic_results", [])
+        ]
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(min=1, max=5),
+        reraise=True,
+    )
+    async def _litescrape_search(
+        self, query: str, num_results: int
+    ) -> list[dict[str, str]]:
+        api_key = self._settings.litescrape_api_key.get_secret_value()
+
+        async with httpx.AsyncClient(timeout=self._settings.search_timeout) as client:
+            resp = await client.get(
+                f"{self._settings.litescrape_base_url.rstrip('/')}/api/google/search",
+                headers={"Authorization": f"Bearer {api_key}"},
+                params={"q": query, "num": num_results},
+            )
+            resp.raise_for_status()
+            data = resp.json()
+
+        return [
+            {
+                "title": r.get("title", ""),
+                "url": r.get("link", ""),
+                "snippet": r.get("snippet", "")[:500],
+                "score": "1.0",
+            }
+            for r in data.get("organic_results", [])[:num_results]
         ]
