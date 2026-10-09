@@ -16,6 +16,7 @@ class LLMProvider(str, Enum):
 class SearchProvider(str, Enum):
     TAVILY = "tavily"
     SERPAPI = "serpapi"
+    SERPER = "serper"
 
 
 class Settings(BaseSettings):
@@ -35,6 +36,8 @@ class Settings(BaseSettings):
     # Search
     tavily_api_key: SecretStr = Field(default="")
     serpapi_api_key: SecretStr = Field(default="")
+    serper_api_key: SecretStr = Field(default=SecretStr(""))
+    serper_base_url: str = "https://google.serper.dev"
     search_provider: SearchProvider = SearchProvider.TAVILY
 
     # Redis

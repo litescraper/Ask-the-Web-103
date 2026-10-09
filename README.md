@@ -417,7 +417,7 @@ SERPAPI_API_KEY=...                 # Get at: https://serpapi.com (fallback)
 # Which providers to use by default
 DEFAULT_LLM_PROVIDER=openai         # openai | anthropic
 DEFAULT_MODEL=gpt-4o                # gpt-4o | gpt-4o-mini | claude-3-5-sonnet-...
-SEARCH_PROVIDER=tavily              # tavily | serpapi
+SEARCH_PROVIDER=tavily              # tavily | serpapi | serper
 
 # Redis (skip for local dev — cache silently disabled if unavailable)
 REDIS_URL=redis://localhost:6379/0
@@ -1299,7 +1299,9 @@ Full reference:
 | `FALLBACK_MODEL` | `str` | `gpt-4o-mini` | Fallback on error |
 | `TAVILY_API_KEY` | `str` | — | Tavily search key |
 | `SERPAPI_API_KEY` | `str` | — | SerpAPI key (fallback) |
-| `SEARCH_PROVIDER` | `tavily\|serpapi` | `tavily` | Search backend |
+| `SERPER_API_KEY` | `str` | — | Compatible provider API key |
+| `SERPER_BASE_URL` | `str` | `https://google.serper.dev` | Provider base URL without `/search` |
+| `SEARCH_PROVIDER` | `tavily\|serpapi\|serper` | `tavily` | Search backend |
 | `REDIS_URL` | `str` | `redis://localhost:6379/0` | Redis connection |
 | `APP_ENV` | `development\|staging\|production` | `production` | Environment |
 | `LOG_LEVEL` | `str` | `INFO` | Log verbosity |
@@ -1322,6 +1324,18 @@ DEFAULT_MODEL=claude-3-5-sonnet-20241022
 ```env
 SEARCH_PROVIDER=serpapi
 SERPAPI_API_KEY=your-key
+```
+
+**Using a Serper-compatible provider:**
+
+Support any Serper.dev-compatible endpoint (like litescrape.com, serpbase.dev,
+serpensapi.org, and others). Set the provider base URL without `/search` and
+use its API key:
+
+```env
+SEARCH_PROVIDER=serper
+SERPER_API_KEY=your-key
+SERPER_BASE_URL=https://google.serper.dev
 ```
 
 ---
